@@ -1,21 +1,139 @@
 <html>
   <head>
   	<script src="https://d3js.org/d3.v6.min.js"></script>
+  	<style>
+	    .gridlines line {
+	      stroke: #bbb;
+	    }
+
+	    .gridlines .domain {
+	      stroke: none;
+	    }
+
+	    .axis {
+	    	font-size: 14px;
+	    }
+  </style>
   </head>
 
   <body>
+
+  	<svg id="graph1" height="800" width="1200"></svg>
+
   	<script>
+	    const svg = d3.select("svg#graph1");
+	    const width = svg.attr("width");
+	    const height = svg.attr("height");
+	    const margin = {"top": 100, "right": 100, "bottom": 100, "left": 150};
+	    const chartWidth = width - margin.left - margin.right;
+	    const chartHeight = height - margin.top - margin.bottom;
+
 		d3.json("/data.json").then( (data) => {
-			console.log(data)
+			console.log(data); // 23860 rows
 
-			// data.forEach( (d, i) => {
-			// 	d['points'] = Number(d['points']);
-			// 	d['price'] = Number(d['price'].replace(/,/g,"").replace(/\$/g,"")); 
-			// });
+			// Filter to include only those who have answers in all of the columns
+			// Filter to include only the top 7 job titles found during preprocessing
+			// Research Scientist, Consultant, Data Engineer, Business Analyst
+			// Filter to include only those who reported salary data 
+			// Filter to include only top 5 tools found during preprocessing
+			data = data.filter( (d) => {
+				return (d.job && d.YoE && d.income && d.tool) 
+				&& ['Data Scientist','Software Engineer','Data Analyst','Research Scientist','Consultant','Data Engineer','Business Analyst'].includes(d.job) 
+				&& d.income !== 'What is your current yearly compensation (approximate $USD)?' 
+				&& d.income !== 'I do not wish to disclose my approximate yearly compensation'
+				&& ['Matplotlib', 'ggplot2', 'Seaborn', 'Plotly', 'D3'].includes(d.tool);  
+			});
+			console.log(data); // 6308 rows
 
-			// data = data.filter( (d) => {
-			// return d['points'] >= 80 && d['points'] <= 100 && d['price'] > 0 && d['state'] !== 'Fhloston Paradise' && d['state'] !== 'Mars';
-			// });
+			// need to convert the string income (e.g. "30-40,000") to numbers 
+			data.forEach( (d, i) => {
+				if(d.income === "500,000+"){
+					d.income = 500000; // only 15 counts of $500,000+ in 6308 rows of data; can leave in 				
+				} else {
+					before = Number(d['income'].split("-")[0].replace(/,/g,""));
+					after = Number(d['income'].split("-")[1].replace(/,/g,""));
+					d['income'] = (before*1000 + after)/2;
+				};
+			});
+			console.log(data);
+
+			// Sort data by income 
+			data.sort((a, b) => parseFloat(a.income) - parseFloat(b.income));
+
+			// Add a median income column (depending on d.tool and d.job)
+
+
+			
+
+
+			console.log(data);
+
+			// Scales
+			const incomeExtent = d3.extent(data, d => d['income']);
+		    const incomeScale = d3.scaleLinear().domain([0, incomeExtent[1]]).range([0, chartWidth]);
+
+		    const jobScale = d3.scalePoint().domain(['Data Scientist','Software Engineer','Data Analyst','Research Scientist','Consultant','Data Engineer','Business Analyst']).range([chartHeight, 0]);
+
+		    const toolScale = d3.scaleOrdinal(d3.schemeCategory10);
+
+		    // Axes
+		    let leftAxis = d3.axisLeft(jobScale) 
+		    svg.append("g")
+		    	.attr("class", "y axis")
+		        .attr("transform","translate("+(margin.left-10)+","+margin.top+")") 
+		        .call(leftAxis);
+
+		    let bottomAxis = d3.axisBottom(incomeScale)
+		    	.tickFormat(d3.format("$,")); 
+		    svg.append("g")
+		    	.attr("class", "x axis")
+		    	.attr("transform","translate("+margin.left+","+(chartHeight+margin.top+15)+")")
+		        .call(bottomAxis);
+
+		    // Gridlines
+	      	let leftGridlines = d3.axisLeft(jobScale)
+	        	.tickSize(-chartWidth)
+	            .tickFormat("");
+		    svg.append("g")
+		        .attr("class", "y gridlines") 
+		        .attr("transform","translate("+ (margin.left) +","+ margin.top +")")
+		        .call(leftGridlines);
+		      
+		    let bottomGridlines = d3.axisBottom(incomeScale)
+          		.tickSize(-chartHeight)
+          		.tickFormat("")
+		    svg.append("g").attr("class", "x gridlines") 
+		        .attr("transform","translate("+margin.left+","+(chartHeight+margin.top)+")")
+		        .call(bottomGridlines);
+
+		    // Axes Labels
+		    svg.append("text")
+			    .attr("class", "x label")
+			    .attr("text-anchor", "middle")
+			    .attr("x", width/2+10)
+			    .attr("y", chartHeight+margin.top+60)
+			    .text("Yearly Compensation (USD)");
+
+			// svg.append("text")
+			//     .attr("class", "y label")
+			//     .attr("text-anchor", "middle")
+			//    	.attr("transform", "rotate(-90)")
+			//     .attr("y", chartHeight/2)
+			//     .attr("x", 30)
+			//     .text("Job Title");
+
+
+		    let chart = svg.append("g").attr("transform","translate("+margin.left+","+margin.top+")");
+
+	        // let circles = chart.selectAll("circle").data(data)
+         //    	.join("circle")
+         //        .attr("cx", d => incomeScale(d['income']))
+         //        .attr("cy", d => jobScale(d['job']))
+         //        .attr("r", 5)
+         //        .style("fill", d => toolScale(d['tool']))
+         //        .attr("opacity", 0.6);
+
+         // plot circles using the median income for each skill for each job
 
 		});
 
