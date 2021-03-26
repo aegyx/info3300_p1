@@ -5,11 +5,9 @@
 	    .gridlines line {
 	      stroke: #bbb;
 	    }
-
 	    .gridlines .domain {
 	      stroke: none;
 	    }
-
 	    .axis {
 	    	font-size: 14px;
 	    }
@@ -55,18 +53,25 @@
 					d['income'] = (before*1000 + after)/2;
 				};
 			});
-			console.log(data);
+
 
 			// Sort data by income 
 			data.sort((a, b) => parseFloat(a.income) - parseFloat(b.income));
 
-			// Add a median income column (depending on d.tool and d.job)
+			// Create dictionary object where keys = job title, and values = {tool : count}
+			// var job_tool_count = []
+			// data.forEach( (d, i) => { 
+			// 	if(d['job'] in job_tool_count) {
+			// 		job_tool_count[d['job']] = {}
+			// 	} else {
+			// 		job_tool_count[d['job']] = {}
+			// 		job_tool_count[d['job']].push({})
+			// 	}
 
+			// });
 
-			
+			// console.log(job_tool_count)
 
-
-			console.log(data);
 
 			// Scales
 			const incomeExtent = d3.extent(data, d => d['income']);
