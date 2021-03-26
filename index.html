@@ -31,9 +31,8 @@
 
 			// Filter to include only those who have answers in all of the columns
 			// Filter to include only the top 7 job titles found during preprocessing
-			// Research Scientist, Consultant, Data Engineer, Business Analyst
-			// Filter to include only those who reported salary data 
 			// Filter to include only top 5 tools found during preprocessing
+			// Filter to include only those who chose to reveal their income  
 			data = data.filter( (d) => {
 				return (d.job && d.YoE && d.income && d.tool) 
 				&& ['Data Scientist','Software Engineer','Data Analyst','Research Scientist','Consultant','Data Engineer','Business Analyst'].includes(d.job) 
