@@ -4,7 +4,23 @@
   </head>
 
   <body>
+  	<script>
+		d3.json("/data.json").then( (data) => {
+			console.log(data)
 
+			// data.forEach( (d, i) => {
+			// 	d['points'] = Number(d['points']);
+			// 	d['price'] = Number(d['price'].replace(/,/g,"").replace(/\$/g,"")); 
+			// });
+
+			// data = data.filter( (d) => {
+			// return d['points'] >= 80 && d['points'] <= 100 && d['price'] > 0 && d['state'] !== 'Fhloston Paradise' && d['state'] !== 'Mars';
+			// });
+
+		});
+
+
+  	</script>
 
   	
   </body>
