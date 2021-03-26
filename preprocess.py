@@ -39,7 +39,7 @@ column_list = ['Q6','Q8','Q9','Q22']
 column_list.extend(q21_list)
 
 processed = raw[column_list]
-processed.to_json("./data.json", orient="index")
+processed.to_json("./data.json", orient="records")
 
 
  
