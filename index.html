@@ -162,12 +162,12 @@
 
 		    let chart = svg.append("g").attr("transform","translate("+margin.left+","+margin.top+")");
 
-        let circles = chart.selectAll("circle").data(data)
+        let circles = chart.selectAll("circle").data(summary)
             .join("circle")
-              .attr("cx", incomeScale(summary['income_mean']))
-              .attr("cy", d => jobScale(summary['job']))
+              .attr("cx", d => incomeScale(d['income_mean']))
+              .attr("cy", d => jobScale(d['job']))
               .attr("r", 5)
-              .style("fill", d => toolScale(summary['tool']))
+              .style("fill", d => toolScale(d['tool']))
               .attr("opacity", 0.6);
 
 	        // let circles = chart.selectAll("circle").data(data)
