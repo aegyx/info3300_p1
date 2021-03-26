@@ -39,6 +39,7 @@ column_list = ['Q6','Q8','Q9','Q22']
 column_list.extend(q21_list)
 
 processed = raw[column_list]
+processed.rename(columns={'Q6':'job', 'Q8':'YoE', 'Q9':'income', 'Q22':'tool'}, inplace=True)
 processed.to_json("./data.json", orient="records")
 
 
