@@ -107,78 +107,81 @@
 
 			// Scales
 			const incomeExtent = d3.extent(summary, d => d['income_mean']);
-		   	const incomeScale = d3.scaleLinear().domain([1, incomeExtent[1]]).range([0, chartWidth]);
+	   	const incomeScale = d3.scaleLinear().domain([1, incomeExtent[1]]).range([0, chartWidth]);
 
-		    const jobScale = d3.scalePoint().domain(['Data Scientist','Software Engineer','Data Analyst','Research Scientist','Consultant','Data Engineer','Business Analyst']).range([chartHeight, 0]);
+	    const jobScale = d3.scalePoint().domain(['Data Scientist','Software Engineer','Data Analyst','Research Scientist','Consultant','Data Engineer','Business Analyst']).range([chartHeight, 0]);
 
-		    const toolScale = d3.scaleOrdinal(d3.schemeCategory10);
+	    const toolScale = d3.scaleOrdinal(d3.schemeCategory10);
 
-		    // Axes
-		    let leftAxis = d3.axisLeft(jobScale)
-		    svg.append("g")
-		    	.attr("class", "y axis")
-		        .attr("transform","translate("+(margin.left-10)+","+margin.top+")")
-		        .call(leftAxis);
+      const sizeExtent = d3.extent(summary, d => d['proportion']);
+      const sizeScale = d3.scaleLinear().domain([1, sizeExtent[1]]).range([5, 15]);
 
-		    let bottomAxis = d3.axisBottom(incomeScale)
-		    	.tickFormat(d3.format("$,"));
-		    svg.append("g")
-		    	.attr("class", "x axis")
-		    	.attr("transform","translate("+margin.left+","+(chartHeight+margin.top+15)+")")
-		        .call(bottomAxis);
+	    // Axes
+	    let leftAxis = d3.axisLeft(jobScale)
+	    svg.append("g")
+	    	.attr("class", "y axis")
+	        .attr("transform","translate("+(margin.left-10)+","+margin.top+")")
+	        .call(leftAxis);
 
-		    // Gridlines
-	      	let leftGridlines = d3.axisLeft(jobScale)
-	        	.tickSize(-chartWidth)
-	            .tickFormat("");
-		    svg.append("g")
-		        .attr("class", "y gridlines")
-		        .attr("transform","translate("+ (margin.left) +","+ margin.top +")")
-		        .call(leftGridlines);
+	    let bottomAxis = d3.axisBottom(incomeScale)
+	    	.tickFormat(d3.format("$,"));
+	    svg.append("g")
+	    	.attr("class", "x axis")
+	    	.attr("transform","translate("+margin.left+","+(chartHeight+margin.top+15)+")")
+	        .call(bottomAxis);
 
-		    let bottomGridlines = d3.axisBottom(incomeScale)
-          		.tickSize(-chartHeight)
-          		.tickFormat("")
-		    svg.append("g").attr("class", "x gridlines")
-		        .attr("transform","translate("+margin.left+","+(chartHeight+margin.top)+")")
-		        .call(bottomGridlines);
+	    // Gridlines
+      	let leftGridlines = d3.axisLeft(jobScale)
+        	.tickSize(-chartWidth)
+            .tickFormat("");
+	    svg.append("g")
+	        .attr("class", "y gridlines")
+	        .attr("transform","translate("+ (margin.left) +","+ margin.top +")")
+	        .call(leftGridlines);
 
-		    // Axes Labels
-		    svg.append("text")
-			    .attr("class", "x label")
-			    .attr("text-anchor", "middle")
-			    .attr("x", width/2+10)
-			    .attr("y", chartHeight+margin.top+60)
-			    .text("Yearly Compensation (USD)");
+	    let bottomGridlines = d3.axisBottom(incomeScale)
+        		.tickSize(-chartHeight)
+        		.tickFormat("")
+	    svg.append("g").attr("class", "x gridlines")
+	        .attr("transform","translate("+margin.left+","+(chartHeight+margin.top)+")")
+	        .call(bottomGridlines);
 
-			// svg.append("text")
-			//     .attr("class", "y label")
-			//     .attr("text-anchor", "middle")
-			//    	.attr("transform", "rotate(-90)")
-			//     .attr("y", chartHeight/2)
-			//     .attr("x", 30)
-			//     .text("Job Title");
+	    // Axes Labels
+	    svg.append("text")
+		    .attr("class", "x label")
+		    .attr("text-anchor", "middle")
+		    .attr("x", width/2+10)
+		    .attr("y", chartHeight+margin.top+60)
+		    .text("Yearly Compensation (USD)");
+
+		// svg.append("text")
+		//     .attr("class", "y label")
+		//     .attr("text-anchor", "middle")
+		//    	.attr("transform", "rotate(-90)")
+		//     .attr("y", chartHeight/2)
+		//     .attr("x", 30)
+		//     .text("Job Title");
 
 
-		    let chart = svg.append("g").attr("transform","translate("+margin.left+","+margin.top+")");
+	    let chart = svg.append("g").attr("transform","translate("+margin.left+","+margin.top+")");
 
-        let circles = chart.selectAll("circle").data(summary)
-            .join("circle")
-              .attr("cx", d => incomeScale(d['income_mean']))
-              .attr("cy", d => jobScale(d['job']))
-              .attr("r", 10)
-              .style("fill", d => toolScale(d['tool']))
-              .attr("opacity", 0.6);
+      let circles = chart.selectAll("circle").data(summary)
+          .join("circle")
+            .attr("cx", d => incomeScale(d['income_mean']))
+            .attr("cy", d => jobScale(d['job']))
+            .attr("r", d => sizeScale(d['proportion']))
+            .style("fill", d => toolScale(d['tool']))
+            .attr("opacity", 0.6);
 
-	        // let circles = chart.selectAll("circle").data(data)
-          //   	.join("circle")
-          //       .attr("cx", d => incomeScale(d['income']))
-          //       .attr("cy", d => jobScale(d['job']))
-          //       .attr("r", 5)
-          //       .style("fill", d => toolScale(d['tool']))
-          //       .attr("opacity", 0.6);
+        // let circles = chart.selectAll("circle").data(data)
+        //   	.join("circle")
+        //       .attr("cx", d => incomeScale(d['income']))
+        //       .attr("cy", d => jobScale(d['job']))
+        //       .attr("r", 5)
+        //       .style("fill", d => toolScale(d['tool']))
+        //       .attr("opacity", 0.6);
 
-         // plot circles using the median income for each skill for each job
+       // plot circles using the median income for each skill for each job
 
 		});
 
