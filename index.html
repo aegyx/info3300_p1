@@ -106,8 +106,8 @@
 
 
 			// Scales
-			const incomeExtent = d3.extent(data, d => d['income']);
-		    const incomeScale = d3.scaleLinear().domain([0, incomeExtent[1]]).range([0, chartWidth]);
+			const incomeExtent = d3.extent(summary, d => d['income_mean']);
+		   	const incomeScale = d3.scaleLinear().domain([1, incomeExtent[1]]).range([0, chartWidth]);
 
 		    const jobScale = d3.scalePoint().domain(['Data Scientist','Software Engineer','Data Analyst','Research Scientist','Consultant','Data Engineer','Business Analyst']).range([chartHeight, 0]);
 
@@ -166,7 +166,7 @@
             .join("circle")
               .attr("cx", d => incomeScale(d['income_mean']))
               .attr("cy", d => jobScale(d['job']))
-              .attr("r", 5)
+              .attr("r", 10)
               .style("fill", d => toolScale(d['tool']))
               .attr("opacity", 0.6);
 
