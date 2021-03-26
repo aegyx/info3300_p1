@@ -69,10 +69,10 @@
         var job = d["job"];
         var job_i = jobList.indexOf(job);
         var income = d["income"];
-        summary[tool_i*job_i]["income"].push(income);
-        summary[tool_i*job_i]["tool_count"]++;
-        for (i=0; i<jobList.length; i++) {
-          summary[i*job_i]["job_count"]++;
+        summary[job_i*toolList.length+tool_i]["income"].push(income);
+        summary[job_i*toolList.length+tool_i]["tool_count"]++;
+        for (i=0; i<toolList.length; i++) {
+          summary[job_i*toolList.length+i]["job_count"]++;
         };
       });
 
