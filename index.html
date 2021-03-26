@@ -114,7 +114,7 @@
 	    const toolScale = d3.scaleOrdinal(d3.schemeCategory10);
 
       const sizeExtent = d3.extent(summary, d => d['proportion']);
-      const sizeScale = d3.scaleLinear().domain([1, sizeExtent[1]]).range([5, 15]);
+      const sizeScale = d3.scaleLinear().domain(sizeExtent).range([10, 30]);
 
 	    // Axes
 	    let leftAxis = d3.axisLeft(jobScale)
