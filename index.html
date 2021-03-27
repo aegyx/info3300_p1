@@ -10,9 +10,6 @@
 	    .legend span {
 	        margin-right: 20px;
 	    }
-	    svg {
-	    	display: inline-block;
-	    }
 	    .gridlines line {
 	      stroke: #bbb;
 	    }
@@ -46,10 +43,9 @@
 
   	<h3> Data Visualization Tools: Popularity and Profitability </h3>
 
-  	<svg id="graph1" height="650" width="1000"></svg>
-    <div id="scatterlegend" class="legend"> </div>
-    <div id="sizelegend" class="legend"> </div>
-
+  	<svg id="graph1" height="650" width="1000">
+  		<div id="scatterlegend" class="legend"> </div>
+  	</svg>
 
   	<script>
 	    const svg = d3.select("svg#graph1");
