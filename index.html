@@ -18,6 +18,7 @@
   <body>
 
   	<svg id="graph1" height="800" width="1200"></svg>
+    <div id="scatterlegend" class="legend"> </div>
 
   	<script>
 	    const svg = d3.select("svg#graph1");
@@ -27,6 +28,10 @@
 	    const chartWidth = width - margin.left - margin.right;
 	    const chartHeight = height - margin.top - margin.bottom;
 
+      const jobList = ['Data Scientist','Software Engineer','Data Analyst','Research Scientist','Consultant','Data Engineer','Business Analyst'];
+      const toolList = ['Matplotlib', 'ggplot2', 'Seaborn', 'Plotly', 'D3'];
+      const logoList = ['icons/Matplotlib.svg.png', 'icons/ggplot2.png', 'icons/Seaborn.png', 'icons/Plotly.png', 'icons/D3.png'];
+
 		d3.json("/data.json").then( (data) => {
 			console.log(data); // 23860 rows
 
@@ -34,8 +39,6 @@
 			// Filter to include only the top 7 job titles found during preprocessing
 			// Filter to include only top 5 tools found during preprocessing
 			// Filter to include only those who chose to reveal their income
-      const jobList = ['Data Scientist','Software Engineer','Data Analyst','Research Scientist','Consultant','Data Engineer','Business Analyst'];
-      const toolList = ['Matplotlib', 'ggplot2', 'Seaborn', 'Plotly', 'D3'];
       data = data.filter( (d) => {
 				return (d.job && d.YoE && d.income && d.tool)
 				&& jobList.includes(d.job)
@@ -109,12 +112,13 @@
 			const incomeExtent = d3.extent(summary, d => d['income_mean']);
 	   	const incomeScale = d3.scaleLinear().domain([1, incomeExtent[1]]).range([0, chartWidth]);
 
-	    const jobScale = d3.scalePoint().domain(['Data Scientist','Software Engineer','Data Analyst','Research Scientist','Consultant','Data Engineer','Business Analyst']).range([chartHeight, 0]);
+	    const jobScale = d3.scalePoint().domain(jobList).range([chartHeight, 0]);
 
-	    const toolScale = d3.scaleOrdinal(d3.schemeCategory10);
+	    // const toolScale = d3.scaleOrdinal(d3.schemeCategory10);
+      const toolScale = d3.scaleOrdinal().domain(toolList).range(logoList);
 
       const sizeExtent = d3.extent(summary, d => d['proportion']);
-      const sizeScale = d3.scaleLinear().domain(sizeExtent).range([10, 30]);
+      const sizeScale = d3.scaleLinear().domain(sizeExtent).range([20, 120]);
 
 	    // Axes
 	    let leftAxis = d3.axisLeft(jobScale)
@@ -163,25 +167,65 @@
 		//     .text("Job Title");
 
 
+       // plot circles using the median income for each skill for each job
 	    let chart = svg.append("g").attr("transform","translate("+margin.left+","+margin.top+")");
 
-      let circles = chart.selectAll("circle").data(summary)
-          .join("circle")
-            .attr("cx", d => incomeScale(d['income_mean']))
-            .attr("cy", d => jobScale(d['job']))
-            .attr("r", d => sizeScale(d['proportion']))
-            .style("fill", d => toolScale(d['tool']))
-            .attr("opacity", 0.6);
+      let defs = svg.append('svg:defs');
+      let imgs = defs.selectAll("pattern").data(summary)
+          .join("svg:pattern")
+          .attr("id", d => d["job"] + d["tool"])
+          .attr("width", d => sizeScale(d["proportion"]))
+          .attr("height", d => sizeScale(d["proportion"]))
+          .attr("patternUnits", "userSpaceOnUse")
+          .append("svg:image")
+          .attr("xlink:href", d => toolScale(d["tool"]))
+          .attr("width", d => sizeScale(d["proportion"]))
+          .attr("height", d => sizeScale(d["proportion"]))
+          .attr("x", 0)
+          .attr("y", 0);
 
-        // let circles = chart.selectAll("circle").data(data)
-        //   	.join("circle")
-        //       .attr("cx", d => incomeScale(d['income']))
-        //       .attr("cy", d => jobScale(d['job']))
-        //       .attr("r", 5)
-        //       .style("fill", d => toolScale(d['tool']))
-        //       .attr("opacity", 0.6);
+      let icons = chart.selectAll("rect").data(summary)
+          .join("rect")
+            .attr("x", d => incomeScale(d['income_mean']) - sizeScale(d['proportion'])/2)
+            .attr("y", d => jobScale(d['job']) - sizeScale(d['proportion'])/2)
+            .attr("width", d => sizeScale(d['proportion']))
+            .attr("height", d => sizeScale(d['proportion']))
+            // .style("fill", d => toolScale(d['tool']))
+            .style("fill", "#fff")
+            .style("fill", d => "url(#" + d["job"] + d["tool"] + ")")
+            .attr("opacity", 0.6)
+            .attr("tool", d => d['tool']);
 
-       // plot circles using the median income for each skill for each job
+      // let circles = chart.selectAll("circle").data(summary)
+      //     .join("circle")
+      //       .attr("cx", d => incomeScale(d['income_mean']))
+      //       .attr("cy", d => jobScale(d['job']))
+      //       .attr("r", d => sizeScale(d['proportion']))
+      //       // .style("fill", d => toolScale(d['tool']))
+      //       .style("fill", "#fff")
+      //       .style("fill", d => "url(#" + d["tool"] + ")")
+      //       .attr("opacity", 0.6)
+      //       .attr("tool", d => d['tool']);
+
+       // legends
+       // toolScale.domain().forEach ( function(d, i) {
+       //
+       //   d3.select("#scatterlegend")
+       //     .append("span")
+       //     .text(d)
+       //     .style("color", toolScale(d))
+       //     .on("mouseover", function() {
+       //       d3.selectAll("#scatterplot circle").each( function() {
+       //         let element = d3.select(this);
+       //         if (element.attr("tool") === d) {
+       //           element.attr("opacity", 0.8);
+       //         }
+       //         else {
+       //           element.attr("opacity", 0.2);
+       //         }
+       //       });
+       //     });
+       // });
 
 		});
 
