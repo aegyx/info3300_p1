@@ -4,13 +4,15 @@
     <title>Project 1</title>
   	<style>
 
-      #scatterlegend {
-        margin-left: 450px;
-      }
-
-      .legend span {
-        margin-right: 20px;
-      }
+	    #scatterlegend {
+	        /*margin-left: 450px;*/
+	    }
+	    .legend span {
+	        margin-right: 20px;
+	    }
+	    svg {
+	    	display: inline-block;
+	    }
 	    .gridlines line {
 	      stroke: #bbb;
 	    }
@@ -18,27 +20,42 @@
 	      stroke: none;
 	    }
 	    .axis {
-	    	font-size: 14px;
+	    	font-size: 13px;
 	    }
+	    .y.axis {
+	    	font-weight: bold;
+	    	font-family: sans-serif;
+	    }
+	    .label {
+	    	font-weight: bold;
+	    	font-size: 17px;
+	    	font-family: sans-serif;
+	    }
+	    h3 {
+	    	font-family: sans-serif;
+	    }
+
   </style>
   </head>
 
   <body>
 
-  	<svg id="graph1" height="800" width="1200"></svg>
+  	<h3> Data Visualization Tools: Popularity and Profitability </h3>
+
+  	<svg id="graph1" height="700" width="1000"></svg>
     <div id="scatterlegend" class="legend"> </div>
 
   	<script>
 	    const svg = d3.select("svg#graph1");
 	    const width = svg.attr("width");
 	    const height = svg.attr("height");
-	    const margin = {"top": 100, "right": 100, "bottom": 100, "left": 150};
+	    const margin = {"top": 200, "right": 100, "bottom": 100, "left": 200};
 	    const chartWidth = width - margin.left - margin.right;
 	    const chartHeight = height - margin.top - margin.bottom;
 
-      const jobList = ['Data Scientist','Software Engineer','Data Analyst','Research Scientist','Consultant','Data Engineer','Business Analyst'];
-      const toolList = ['Matplotlib', 'ggplot2', 'Seaborn', 'Plotly', 'D3'];
-      const logoList = ['icons/Matplotlib.svg.png', 'icons/ggplot2.png', 'icons/Seaborn.png', 'icons/Plotly.png', 'icons/D3.png'];
+     	const jobList = ['Data Scientist','Software Engineer','Data Analyst','Research Scientist','Consultant','Data Engineer','Business Analyst'];
+     	const toolList = ['Matplotlib', 'ggplot2', 'Seaborn', 'Plotly', 'D3'];
+      	const logoList = ['icons/Matplotlib.svg.png', 'icons/ggplot2.png', 'icons/Seaborn.png', 'icons/Plotly.png', 'icons/D3.png'];
 
 		d3.json("/data.json").then( (data) => {
 			console.log(data); // 23860 rows
@@ -47,87 +64,71 @@
 			// Filter to include only the top 7 job titles found during preprocessing
 			// Filter to include only top 5 tools found during preprocessing
 			// Filter to include only those who chose to reveal their income
-      data = data.filter( (d) => {
-				return (d.job && d.YoE && d.income && d.tool)
-				&& jobList.includes(d.job)
-				&& d.income !== 'What is your current yearly compensation (approximate $USD)?'
-				&& d.income !== 'I do not wish to disclose my approximate yearly compensation'
-				&& toolList.includes(d.tool);
-			});
-			console.log(data); // 6308 rows
+      	data = data.filter( (d) => {
+			return (d.job && d.YoE && d.income && d.tool)
+			&& jobList.includes(d.job)
+			&& d.income !== 'What is your current yearly compensation (approximate $USD)?'
+			&& d.income !== 'I do not wish to disclose my approximate yearly compensation'
+			&& toolList.includes(d.tool);
+		});
+			
+		console.log(data); // 6308 rows
 
-			// need to convert the string income (e.g. "30-40,000") to numbers
-			data.forEach( (d, i) => {
-				if(d.income === "500,000+"){
-					d.income = 500000; // only 15 counts of $500,000+ in 6308 rows of data; can leave in
-				} else {
-					before = Number(d['income'].split("-")[0].replace(/,/g,""));
-					after = Number(d['income'].split("-")[1].replace(/,/g,""));
-					d['income'] = (before*1000 + after)/2;
-				};
-			});
+		// need to convert the string income (e.g. "30-40,000") to numbers
+		data.forEach( (d, i) => {
+			if(d.income === "500,000+"){
+				d.income = 500000; // only 15 counts of $500,000+ in 6308 rows of data; can leave in
+			} else {
+				before = Number(d['income'].split("-")[0].replace(/,/g,""));
+				after = Number(d['income'].split("-")[1].replace(/,/g,""));
+				d['income'] = (before*1000 + after)/2;
+			};
+		});
 
-      const summary = [];
-      for (i=0; i<jobList.length; i++){
-        for (j=0; j<toolList.length; j++){
-          summary.push({"job":jobList[i], "tool":toolList[j], "income":[], "income_mean":0, "tool_count":0, "job_count":0, "proportion":0});
-        }
-      };
+      	const summary = [];
+	    for (i=0; i<jobList.length; i++){
+	    	for (j=0; j<toolList.length; j++){
+	          summary.push({"job":jobList[i], "tool":toolList[j], "income":[], "income_mean":0, "tool_count":0, "job_count":0, "proportion":0});
+	        }
+	    };
 
-      data.forEach((d, i) => {
-        var tool = d["tool"];
-        var tool_i = toolList.indexOf(tool);
-        var job = d["job"];
-        var job_i = jobList.indexOf(job);
-        var income = d["income"];
-        summary[job_i*toolList.length+tool_i]["income"].push(income);
-        summary[job_i*toolList.length+tool_i]["tool_count"]++;
-        for (i=0; i<toolList.length; i++) {
-          summary[job_i*toolList.length+i]["job_count"]++;
-        };
-      });
+      	data.forEach((d, i) => {
+	        var tool = d["tool"];
+	        var tool_i = toolList.indexOf(tool);
+	        var job = d["job"];
+	        var job_i = jobList.indexOf(job);
+	        var income = d["income"];
+	        summary[job_i*toolList.length+tool_i]["income"].push(income);
+	        summary[job_i*toolList.length+tool_i]["tool_count"]++;
+	        for (i=0; i<toolList.length; i++) {
+	          summary[job_i*toolList.length+i]["job_count"]++;
+	    };
+      	});
 
-      const reducer = (accumulator, currentValue) => accumulator + currentValue;
-      for (i=0; i<summary.length; i++){
-        if (summary[i]["tool_count"] != 0) {
-          summary[i]["income_mean"] = summary[i]["income"].reduce(reducer)/summary[i]["tool_count"];
-        };
-        summary[i]["proportion"] = summary[i]["tool_count"]/summary[i]["job_count"];
-      };
-
-
-      console.log(summary);
-
-			// Sort data by income
-			// data.sort((a, b) => parseFloat(a.income) - parseFloat(b.income));
-
-			// Create dictionary object where keys = job title, and values = {tool : count}
-			// var job_tool_count = []
-			// data.forEach( (d, i) => {
-			// 	if(d['job'] in job_tool_count) {
-			// 		job_tool_count[d['job']] = {}
-			// 	} else {
-			// 		job_tool_count[d['job']] = {}
-			// 		job_tool_count[d['job']].push({})
-			// 	}
-
-			// });
-
-			// console.log(job_tool_count)
+      	const reducer = (accumulator, currentValue) => accumulator + currentValue;
+      	for (i=0; i<summary.length; i++){
+        	if (summary[i]["tool_count"] != 0) {
+          		summary[i]["income_mean"] = summary[i]["income"].reduce(reducer)/summary[i]["tool_count"];
+        	};
+        	summary[i]["proportion"] = summary[i]["tool_count"]/summary[i]["job_count"];
+      	};
 
 
-			// Scales
-			const incomeExtent = d3.extent(summary, d => d['income_mean']);
+      	console.log(summary);
+
+
+		// Scales
+		const incomeExtent = d3.extent(summary, d => d['income_mean']);
 	   	const incomeScale = d3.scaleLinear().domain([1, incomeExtent[1]]).range([0, chartWidth]);
 
 	    const jobScale = d3.scalePoint().domain(jobList).range([chartHeight, 0]);
 
 	    const toolScale = d3.scaleOrdinal(d3.schemeCategory10);
-      // const toolScale = d3.scaleOrdinal().domain(toolList).range(logoList);
+      	// const toolScale = d3.scaleOrdinal().domain(toolList).range(logoList);
 
-      const sizeExtent = d3.extent(summary, d => d['proportion']);
-      // const sizeScale = d3.scaleLinear().domain(sizeExtent).range([20, 120]);
-      const sizeScale = d3.scaleLinear().domain(sizeExtent).range([10, 30]);
+      	const sizeExtent = d3.extent(summary, d => d['proportion']);
+      	// const sizeScale = d3.scaleLinear().domain(sizeExtent).range([20, 120]);
+      	const sizeScale = d3.scaleLinear().domain(sizeExtent).range([10, 35]);
 
 	    // Axes
 	    let leftAxis = d3.axisLeft(jobScale)
@@ -140,7 +141,7 @@
 	    	.tickFormat(d3.format("$,"));
 	    svg.append("g")
 	    	.attr("class", "x axis")
-	    	.attr("transform","translate("+margin.left+","+(chartHeight+margin.top+15)+")")
+	    	.attr("transform","translate("+margin.left+","+(chartHeight+margin.top+20)+")")
 	        .call(bottomAxis);
 
 	    // Gridlines
@@ -163,17 +164,9 @@
 	    svg.append("text")
 		    .attr("class", "x label")
 		    .attr("text-anchor", "middle")
-		    .attr("x", width/2+10)
-		    .attr("y", chartHeight+margin.top+60)
-		    .text("Yearly Compensation (USD)");
-
-		// svg.append("text")
-		//     .attr("class", "y label")
-		//     .attr("text-anchor", "middle")
-		//    	.attr("transform", "rotate(-90)")
-		//     .attr("y", chartHeight/2)
-		//     .attr("x", 30)
-		//     .text("Job Title");
+		    .attr("x", width/2+5)
+		    .attr("y", chartHeight+margin.top+85)
+		    .text("Mean Yearly Compensation (USD)");
 
 
        // plot circles using the median income for each skill for each job
@@ -216,18 +209,16 @@
 
        //legends
        toolScale.domain().forEach ( function(d, i) {
-
          d3.select("#scatterlegend")
-          .append("span")
-           .text(d)
-           .style("color", toolScale(d));
+         	.append("span")
+         	.text(d)
+         	.style("color", toolScale(d));
        });
 
 		});
 
 
   	</script>
-
 
   </body>
 </html>
