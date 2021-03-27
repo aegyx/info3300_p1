@@ -5,7 +5,7 @@
   	<style>
 
 	    #scatterlegend {
-	        /*margin-left: 450px;*/
+	        margin-left: 395px;
 	    }
 	    .legend span {
 	        margin-right: 20px;
@@ -28,11 +28,15 @@
 	    }
 	    .label {
 	    	font-weight: bold;
-	    	font-size: 17px;
+	    	font-size: 19px;
 	    	font-family: sans-serif;
 	    }
 	    h3 {
 	    	font-family: sans-serif;
+	    	font-size: 30px;
+	    	margin-left: 165px;
+	    	margin-bottom: -30px;
+	    	margin-top: 50px;
 	    }
 
   </style>
@@ -42,14 +46,16 @@
 
   	<h3> Data Visualization Tools: Popularity and Profitability </h3>
 
-  	<svg id="graph1" height="700" width="1000"></svg>
+  	<svg id="graph1" height="650" width="1000"></svg>
     <div id="scatterlegend" class="legend"> </div>
+    <div id="sizelegend" class="legend"> </div>
+
 
   	<script>
 	    const svg = d3.select("svg#graph1");
 	    const width = svg.attr("width");
 	    const height = svg.attr("height");
-	    const margin = {"top": 200, "right": 100, "bottom": 100, "left": 200};
+	    const margin = {"top": 100, "right": 100, "bottom": 100, "left": 200};
 	    const chartWidth = width - margin.left - margin.right;
 	    const chartHeight = height - margin.top - margin.bottom;
 
@@ -164,7 +170,7 @@
 	    svg.append("text")
 		    .attr("class", "x label")
 		    .attr("text-anchor", "middle")
-		    .attr("x", width/2+5)
+		    .attr("x", width/2+50)
 		    .attr("y", chartHeight+margin.top+85)
 		    .text("Mean Yearly Compensation (USD)");
 
@@ -215,7 +221,8 @@
          	.style("color", toolScale(d));
        });
 
-		});
+
+	});
 
 
   	</script>
